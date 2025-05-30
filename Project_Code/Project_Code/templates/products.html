@@ -1,0 +1,194 @@
+{%extends "base.html" %}
+{%block content%}
+<div class=row>
+<div class=col-md-4></div>
+<div class=col-md-4>
+<button class='btn btn-primary' id=newprd>Add New Product</button><br><br>
+<table  class="table">
+	<tr><th>Product</th><th>Action</th></tr>
+	<tbody id=data>
+	
+	 
+	
+	</tbody>
+
+</table>
+</div>
+
+<script>
+$(document).ready(()=>{
+	setInterval(function(){
+	$.getJSON("/getproducts", (res)=>{
+		$("#data").html("");
+		res.forEach((e)=>{ $("#data").append("<tr><td>"+e[1]+"</td><td><span class=\"glyphicon glyphicon-pencil\" style='cursor:pointer' onclick='opem("+e[0]+")'></span></td> </tr>");  });
+	
+	});
+	},
+	500);
+	
+	
+	$("#newprd").click(()=>{ 
+		$("#ptitle").val("");
+		$("#pdescr").val("");
+		$("#err").val("");
+	
+	$("#mymodal").modal("show");   });
+});
+
+
+function opem(a)
+{
+	$("#err1").html("");
+	$.getJSON("/getproduct/"+a, (res)=>{
+			$("#ptitle1").val(res[1]);
+			$("#pdescr1").val(res[2]);
+			$("#id1").val(res[0]);
+			$("#id2").val(res[0]);
+			
+			$("#mat1").html("");
+			$("#mat2").html("");
+			
+			getMat();
+			
+			
+			
+			$("#mymodal2").modal("show");	
+			
+	});
+
+}
+
+
+
+
+function getMat()
+{
+	$("#err1").html("");
+	$.getJSON("/getmaterials", (res)=>{
+			res.forEach(m=>$("#mat1").append("<option value='"+m[0]+"'>"+m[1]+"</option>"));
+			
+			getPrdMat();
+	});
+
+}
+
+
+
+function delmatprd(a)
+{
+	$("#err1").html("");
+	$.getJSON("/delprdmat/"+a, (res)=>{
+			getPrdMat();
+	});
+
+}
+
+
+
+
+function getPrdMat()
+{
+	$("#err1").html("");
+	$("#mat2").html("");
+	var a=$("#id1").val();
+	$.getJSON("/getprdmat/"+a, (res)=>{
+			res.forEach(m=>$("#mat2").append("<span style='font-size:12pt' class='label label-success'>"+m[1]+"  Quant="+m[6]+" <span onclick='delmatprd("+m[3]+")'>[x]</span></span> &nbsp;&nbsp;"));
+	});
+
+}
+
+</script>
+
+</div>
+
+
+<!-- Modal -->
+<div id="mymodal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Add New Product</h4>
+      </div>
+      <div class="modal-body">
+		 <form action="" method=post id=formprd>
+		  <div class="form-group">
+		    <label >Product Title:</label>
+		    <input type="text" class="form-control" id="ptitle" name='ptitle' required>
+		  </div>
+		  <div class="form-group">
+		    <label for="pwd">Description:</label>
+		    <textarea class="form-control" name=pdescr></textarea>
+		  </div>
+		 
+		  <button type="submit"  class="btn btn-default">Add</button>
+		  
+		</form> 
+		<div id=err>
+
+		</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+<!-- Modal -->
+<div id="mymodal2" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Material</h4>
+      </div>
+      <div class="modal-body">
+		 <form action="" method=post id=formprd2>
+		  <div class="form-group">
+		    <label >Product Title:</label>
+		    <input type="text" class="form-control" id="ptitle1" name=ptitle1 required>
+		  </div>
+		  <div class="form-group">
+		    <label for="pwd">Description:</label>
+		    <textarea class="form-control" id=pdescr1 name=pdescr1></textarea>
+		  </div>
+		  <input type=hidden name=id1 value='' id=id1>
+		 <input type=hidden name=sv value='' id=sv1>
+		  <input type="submit" class="btn btn-success" value='Save' onclick="document.getElementById('sv1').value=0" > 
+		  <input type="submit" class="btn btn-danger" value='Delete' onclick="document.getElementById('sv1').value=1" >
+		  
+		</form> 
+		
+		
+		<div id=err1>
+
+		</div>
+		<br><br>
+		<form action='' method=post id=formprdmat>
+		Add Material<select name='mat1' id=mat1></select> 
+		<input type=hidden name=id2 value='' id=id2>
+		
+		Quantity:<input type=number name='quant' id='quant' style='width:60px;' step="0.01" value=1><button class='btn btn-primary'>+</button>
+		</form>
+		<div id=mat2></div>
+		
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+  
+{% endblock %}

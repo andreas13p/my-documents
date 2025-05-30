@@ -1,0 +1,132 @@
+{%extends "base.html" %}
+{%block content%}
+<h1>Categories</h1>
+<div class=row>
+<div class=col-md-4></div>
+<div class=col-md-4>
+<button class='btn btn-primary' id=newcat>Add </button><br><br>
+<table  class="table">
+	<tr><th>Category</th><th>Action</th></tr>
+	<tbody id=data>	</tbody>
+
+</table>
+</div>
+
+<script>
+$(document).ready(()=>{
+	setInterval(function(){
+	$.getJSON("/getcategories", (res)=>{
+		$("#data").html("");
+		res.forEach((e)=>{ $("#data").append("<tr><td>"+e[1]+"</td><td><span class=\"glyphicon glyphicon-pencil\" style='cursor:pointer' onclick='opem("+e[0]+")'></span></td></tr>");  });
+	
+	});
+	},
+	500);
+	
+	
+	$("#newcat").click(()=>{ 
+		$("#cat").val("");
+		$("#catdescr").val("");
+		$("#err").val("");
+	
+	$("#mymodal").modal("show");   });
+});
+
+
+function opem(a)
+{
+	$("#err1").html("");
+	$.getJSON("/getcategory/"+a, (res)=>{
+			$("#cat1").val(res[1]);
+			$("#catdescr1").val(res[2]);
+			$("#id1").val(res[0]);
+			
+			$("#mymodal2").modal("show");	
+	});
+
+}
+
+</script>
+
+</div>
+
+
+<!-- Modal -->
+<div id="mymodal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Add New Category</h4>
+      </div>
+      <div class="modal-body">
+		 <form action="" method=post id=formcat>
+		  <div class="form-group">
+		    <label >Category Name:</label>
+		    <input type="text" class="form-control" id="cat" name='cat' required>
+		  </div>
+		  <div class="form-group">
+		    <label for="pwd">Description:</label>
+		    <textarea class="form-control" name=catdescr></textarea>
+		  </div>
+		 
+		  <button type="submit"  class="btn btn-default">Add</button>
+		  
+		</form> 
+		<div id=err>
+
+		</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+
+
+<!-- Modal -->
+<div id="mymodal2" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Category Data</h4>
+      </div>
+      <div class="modal-body">
+		 <form action="" method=post id=formcat2>
+		  <div class="form-group">
+		    <label >Category Name:</label>
+		    <input type="text" class="form-control" id="cat1" name=cat1 required>
+		  </div>
+		  <div class="form-group">
+		    <label for="pwd">Description:</label>
+		    <textarea class="form-control" id=catdescr1 name=catdescr1></textarea>
+		  </div>
+		  <input type=hidden name=id1 value='' id=id1>
+		 <input type=hidden name=sv value='' id=sv1>
+		  <input type="submit" class="btn btn-success" value='Save' onclick="document.getElementById('sv1').value=0" > 
+		  <input type="submit" class="btn btn-danger" value='Delete' onclick="document.getElementById('sv1').value=1" >
+		  
+		</form> 
+		<div id=err1>
+
+		</div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+  
+{% endblock %}
